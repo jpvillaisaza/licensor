@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE RecordWildCards #-}
 
 module Main
@@ -12,11 +13,16 @@ import Licensor
 import Control.Monad
 import Data.List
 import Data.Monoid ((<>))
+import qualified Data.Version as Version
+import System.Environment
 import qualified System.Exit as Exit
 
 -- Cabal
 import Distribution.PackageDescription
 import Distribution.Text
+
+-- cmdargs
+import System.Console.CmdArgs
 
 -- containers
 import qualified Data.Map.Strict as Map
@@ -27,8 +33,35 @@ import qualified Data.Set as Set
 --
 --
 
+data LiArgs =
+  LiArgs
+    {
+    }
+  deriving (Data)
+
+
+-- |
+--
+--
+
+liArgs :: String -> Mode (CmdArgs LiArgs)
+liArgs s =
+  cmdArgsMode $
+    LiArgs
+      {
+      }
+  &= program s
+  &= summary (unwords ["licensor", Version.showVersion version])
+
+
+-- |
+--
+--
+
 main :: IO ()
 main = do
+  LiArgs <- cmdArgsRun . liArgs =<< getProgName
+
   maybePackage <- getPackage
 
   pid <-

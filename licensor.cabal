@@ -19,6 +19,8 @@ library
       src
   exposed-modules:
       Licensor
+  other-modules:
+      Paths_licensor
   build-depends:
       base >= 4.8 && < 5.0
     , Cabal >= 1.22 && < 1.25
@@ -37,6 +39,7 @@ executable licensor
   build-depends:
       base >= 4.8 && < 5.0
     , Cabal >= 1.22 && < 1.25
+    , cmdargs >= 0.10 && < 0.11
     , containers
     , licensor
   default-language:

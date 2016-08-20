@@ -8,11 +8,16 @@ module Licensor
   , getDependencies
   , getPackage
   , orderPackagesByLicense
+  , version
   )
   where
 
+-- licensor
+import qualified Paths_licensor as Paths
+
 -- base
 import Data.Monoid ((<>))
+import Data.Version (Version)
 import System.IO
 
 -- Cabal
@@ -151,3 +156,12 @@ orderPackagesByLicense p =
               orderedPackages
   in
     foldr insertPackage (pure mempty)
+
+
+-- |
+--
+--
+
+version :: Version
+version =
+  Paths.version
