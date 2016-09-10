@@ -1,6 +1,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 ----------------------------------------------------------------------
 -- |
@@ -22,6 +23,7 @@ module Licensor
   where
 
 -- base
+import qualified Control.Exception as Exception
 import Data.Monoid ((<>))
 import Data.Version (Version)
 import System.IO
@@ -121,8 +123,9 @@ getDependencies =
 --
 --
 
-getPackageLicense :: PackageIdentifier -> IO LiLicense
+getPackageLicense :: PackageIdentifier -> IO (Maybe LiLicense)
 getPackageLicense p@PackageIdentifier{..} = do
+  putStr $ display p ++ "..."
   let
     url =
       "GET https://hackage.haskell.org/package/"
@@ -132,15 +135,24 @@ getPackageLicense p@PackageIdentifier{..} = do
         <> ".cabal"
 
   req <- parseRequest url
-  pd <- fmap getResponseBody (httpLBS req)
+  eitherPd <- Exception.try $ fmap getResponseBody (httpLBS req)
 
-  (file, handle) <- openTempFile "/tmp" "licensor"
-  hClose handle
-  ByteString.writeFile file pd
-  PackageDescription{license} <- getPackageDescription file
-  hClose handle
-  removeFile file
-  return (LiLicense license)
+  case eitherPd of
+    Left (_ :: HttpException) ->
+      return Nothing
+
+    Right pd -> do
+
+      (file, handle) <- openTempFile "/tmp" "licensor"
+      hClose handle
+      ByteString.writeFile file pd
+      PackageDescription{license} <- getPackageDescription file
+      hClose handle
+      removeFile file
+
+      putStrLn $ display license
+
+      return $ Just (LiLicense license)
 
 
 -- |
@@ -150,24 +162,33 @@ getPackageLicense p@PackageIdentifier{..} = do
 orderPackagesByLicense
   :: PackageIdentifier
   -> Set PackageIdentifier
-  -> IO (Map LiLicense (Set PackageIdentifier))
+  -> IO (Map LiLicense (Set PackageIdentifier), Set PackageIdentifier)
 orderPackagesByLicense p =
   let
     insertPackage package orderedPackages' = do
-      license <- getPackageLicense package
-      orderedPackages <- orderedPackages'
+      maybeLicense <- getPackageLicense package
+
+      (orderedPackages, failed) <- orderedPackages'
       return $
         if p == package
           then
-            orderedPackages
+            (orderedPackages, failed)
           else
-            Map.insertWith
-              Set.union
-              license
-              (Set.singleton package)
-              orderedPackages
+            case maybeLicense of
+              Nothing ->
+                ( orderedPackages, Set.insert package failed
+                )
+
+              Just license ->
+                ( Map.insertWith
+                    Set.union
+                    license
+                    (Set.singleton package)
+                    orderedPackages
+                , failed
+                )
   in
-    foldr insertPackage (pure mempty)
+    foldr insertPackage (pure (mempty, mempty))
 
 
 -- |

@@ -95,8 +95,10 @@ main = do
       Exit.die "Error: ..."
 
     Just dependencies -> do
-      dependenciesByLicense <-
-        fmap (Set.map display) <$> orderPackagesByLicense pid dependencies
+      (dependenciesByLicense', failed) <-
+        orderPackagesByLicense pid dependencies
+
+      let dependenciesByLicense = fmap (Set.map display) dependenciesByLicense'
 
       forM_ (Map.keys dependenciesByLicense) $
         \license ->
@@ -111,3 +113,7 @@ main = do
                 <> display license
                 <> ": "
                 <> intercalate ", " (Set.toList n)
+
+      unless (null failed) $ do
+        putStr "Failed: "
+        print failed
