@@ -37,6 +37,9 @@ import System.Console.CmdArgs
 import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
 
+-- directory
+import System.Directory (doesFileExist)
+
 
 -- |
 --
@@ -75,8 +78,14 @@ main = do
 
   pid <-
     case maybePackage of
-      Nothing ->
-        Exit.die "Error: No Cabal file found."
+      Nothing -> do
+        stack <- doesFileExist "stack.yaml"
+        if stack
+          then do
+            putStrLn "Found stack.yaml..."
+            return Nothing
+          else
+            Exit.die "Error: No Cabal file found."
 
       Just PackageDescription{..} -> do
         putStrLn $
@@ -86,7 +95,7 @@ main = do
             <> "License: "
             <> display license
             <> ")"
-        return package
+        return (Just package)
 
   maybeDependencies <- getDependencies
 

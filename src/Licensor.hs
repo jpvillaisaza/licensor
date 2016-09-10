@@ -114,9 +114,16 @@ getPackageDescription =
 --
 
 getDependencies :: IO (Maybe (Set PackageIdentifier))
-getDependencies =
-  fmap Set.fromList . sequence . fmap simpleParse . lines
-    <$> readProcess "stack" ["list-dependencies", "--separator", "-"] ""
+getDependencies = do
+  eitherDeps <-
+    Exception.try $ readProcess "stack" ["list-dependencies", "--separator", "-"] ""
+
+  case eitherDeps of
+    Left (_ :: IOError) ->
+      return Nothing
+
+    Right deps ->
+      return $ fmap Set.fromList $ sequence $ fmap simpleParse (lines deps)
 
 
 -- |
@@ -160,17 +167,20 @@ getPackageLicense p@PackageIdentifier{..} = do
 --
 
 orderPackagesByLicense
-  :: PackageIdentifier
+  :: Maybe PackageIdentifier
   -> Set PackageIdentifier
   -> IO (Map LiLicense (Set PackageIdentifier), Set PackageIdentifier)
-orderPackagesByLicense p =
+orderPackagesByLicense maybeP =
   let
+    cond =
+      maybe (const False) (==) maybeP
+
     insertPackage package orderedPackages' = do
       maybeLicense <- getPackageLicense package
 
       (orderedPackages, failed) <- orderedPackages'
       return $
-        if p == package
+        if cond package
           then
             (orderedPackages, failed)
           else

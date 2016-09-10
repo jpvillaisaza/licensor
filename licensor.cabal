@@ -55,6 +55,7 @@ executable licensor
     , Cabal >= 1.22 && < 1.25
     , cmdargs >= 0.10 && < 0.11
     , containers
+    , directory
     , licensor
   default-language:
       Haskell2010
