@@ -1,6 +1,15 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE RecordWildCards #-}
 
+----------------------------------------------------------------------
+-- |
+-- Module: Main
+-- Description:
+--
+--
+--
+----------------------------------------------------------------------
+
 module Main
   ( main
   )

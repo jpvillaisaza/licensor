@@ -2,6 +2,15 @@
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE RecordWildCards #-}
 
+----------------------------------------------------------------------
+-- |
+-- Module: Licensor
+-- Description:
+--
+--
+--
+----------------------------------------------------------------------
+
 module Licensor
   ( LiLicense(..)
   , LiPackage(..)
@@ -12,13 +21,13 @@ module Licensor
   )
   where
 
--- licensor
-import qualified Paths_licensor as Paths
-
 -- base
 import Data.Monoid ((<>))
 import Data.Version (Version)
 import System.IO
+
+-- bytestring
+import qualified Data.ByteString.Lazy as ByteString
 
 -- Cabal
 import Distribution.License
@@ -38,12 +47,12 @@ import qualified Data.Set as Set
 -- directory
 import System.Directory
 
--- HTTP
-import Network.HTTP
-  ( getRequest
-  , getResponseBody
-  , simpleHTTP
-  )
+-- http-conduit
+--import Network.HTTP.Client.Conduit
+import Network.HTTP.Simple
+
+-- licensor
+import qualified Paths_licensor
 
 -- process
 import System.Process
@@ -116,15 +125,18 @@ getPackageLicense :: PackageIdentifier -> IO LiLicense
 getPackageLicense p@PackageIdentifier{..} = do
   let
     url =
-      "http://hackage.haskell.org/package/"
+      "GET https://hackage.haskell.org/package/"
         <> display p
         <> "/"
         <> unPackageName pkgName
         <> ".cabal"
-  pd <- simpleHTTP (getRequest url) >>= getResponseBody
+
+  req <- parseRequest url
+  pd <- fmap getResponseBody (httpLBS req)
+
   (file, handle) <- openTempFile "/tmp" "licensor"
   hClose handle
-  writeFile file pd
+  ByteString.writeFile file pd
   PackageDescription{license} <- getPackageDescription file
   hClose handle
   removeFile file
@@ -164,4 +176,4 @@ orderPackagesByLicense p =
 
 version :: Version
 version =
-  Paths.version
+  Paths_licensor.version
