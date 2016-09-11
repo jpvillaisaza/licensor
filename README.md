@@ -1,6 +1,6 @@
-# Licensor: A license compatibility helper
+# The not so great automatic Haskell licensor
 
-[![CircleCI][1]][0]
+[![][1]][0]
 
 [0]: https://circleci.com/gh/jpvillaisaza/licensor
 [1]: https://circleci.com/gh/jpvillaisaza/licensor.svg?style=svg
