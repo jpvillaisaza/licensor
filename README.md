@@ -5,8 +5,8 @@
 [0]: https://circleci.com/gh/jpvillaisaza/licensor
 [1]: https://circleci.com/gh/jpvillaisaza/licensor.svg?style=svg
 
-![][2]
-![][3]
+[![][2]](https://www.stackage.org/lts/package/licensor)
+[![][3]](https://www.stackage.org/nightly/package/licensor)
 
 [2]: https://www.stackage.org/package/licensor/badge/lts
 [3]: https://www.stackage.org/package/licensor/badge/nightly
