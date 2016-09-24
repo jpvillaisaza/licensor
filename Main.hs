@@ -64,6 +64,7 @@ liArgs s =
       }
   &= program s
   &= summary (unwords ["licensor", Version.showVersion version])
+  &= verbosity
 
 
 -- |
@@ -73,6 +74,8 @@ liArgs s =
 main :: IO ()
 main = do
   LiArgs <- cmdArgsRun . liArgs =<< getProgName
+
+  quiet <- fmap not isNormal
 
   maybePackage <- getPackage
 
@@ -105,7 +108,7 @@ main = do
 
     Just dependencies -> do
       (dependenciesByLicense', failed) <-
-        orderPackagesByLicense pid dependencies
+        orderPackagesByLicense quiet pid dependencies
 
       let dependenciesByLicense = fmap (Set.map display) dependenciesByLicense'
 

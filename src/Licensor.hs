@@ -24,6 +24,7 @@ module Licensor
 
 -- base
 import qualified Control.Exception as Exception
+import Control.Monad (unless)
 import Data.Monoid ((<>))
 import Data.Version (Version)
 import System.IO
@@ -130,9 +131,9 @@ getDependencies = do
 --
 --
 
-getPackageLicense :: PackageIdentifier -> IO (Maybe LiLicense)
-getPackageLicense p@PackageIdentifier{..} = do
-  putStr $ display p ++ "..."
+getPackageLicense :: Bool -> PackageIdentifier -> IO (Maybe LiLicense)
+getPackageLicense quiet p@PackageIdentifier{..} = do
+  unless quiet (putStr $ display p ++ "...")
   let
     url =
       "GET https://hackage.haskell.org/package/"
@@ -157,7 +158,7 @@ getPackageLicense p@PackageIdentifier{..} = do
       hClose handle
       removeFile file
 
-      putStrLn $ display license
+      unless quiet (putStrLn $ display license)
 
       return $ Just (LiLicense license)
 
@@ -167,16 +168,17 @@ getPackageLicense p@PackageIdentifier{..} = do
 --
 
 orderPackagesByLicense
-  :: Maybe PackageIdentifier
+  :: Bool
+  -> Maybe PackageIdentifier
   -> Set PackageIdentifier
   -> IO (Map LiLicense (Set PackageIdentifier), Set PackageIdentifier)
-orderPackagesByLicense maybeP =
+orderPackagesByLicense quiet maybeP =
   let
     cond =
       maybe (const False) (==) maybeP
 
     insertPackage package orderedPackages' = do
-      maybeLicense <- getPackageLicense package
+      maybeLicense <- getPackageLicense quiet package
 
       (orderedPackages, failed) <- orderedPackages'
       return $
