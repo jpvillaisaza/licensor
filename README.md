@@ -167,7 +167,8 @@ MIT                       | 7
 
 ## Additional resources
 
-- [Choose a License](http://choosealicense.com/)
+- [Choose a License](https://choosealicense.com/)
+- [The Legal Side of Open Source](https://opensource.guide/legal/)
 - [License compatibility][ar-01]
 - [Understanding open source and free software licensing][ar-02]
   (Andrew M. St. Laurent)
