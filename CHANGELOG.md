@@ -1,3 +1,7 @@
+# 0.2.1 (2017-07-24)
+
+- Allow base 4.10 and Cabal 2.0 (7bbb360)
+
 # 0.2.0 (2016-09-18)
 
 ## Enhancements
