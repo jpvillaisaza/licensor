@@ -51,8 +51,7 @@ import qualified Data.Set as Set
 import System.Directory
 
 -- http-conduit
---import Network.HTTP.Client.Conduit
-import Network.HTTP.Simple
+import Network.HTTP.Simple (HttpException, getResponseBody, httpLBS, parseRequest)
 
 -- licensor
 import qualified Paths_licensor
