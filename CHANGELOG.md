@@ -1,3 +1,7 @@
+# 0.2.2 (2018-01-16)
+
+- Allow http-conduit 2.3 (558fe3d)
+
 # 0.2.1 (2017-07-24)
 
 - Allow base 4.10 and Cabal 2.0 (7bbb360)

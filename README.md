@@ -143,7 +143,7 @@ See [LICENSE.md](LICENSE.md).
 
 ### License report
 
-Licensor (0.2.0) depends on the following libraries:
+Licensor (0.2.2) depends on the following libraries:
 
 Library                   | License
 ------------------------- | -------------------------
@@ -160,10 +160,13 @@ And the following licenses (including transitive dependencies):
 
 License                   | Number of libraries
 ------------------------- | -------------------------
-BSD3                      | 68
-MIT                       | 7
+BSD2                      | 1
+BSD3                      | 70
+ISC                       | 1
+MIT                       | 11
+UnspecifiedLicense        | 1
 
-(Tested with Licensor 0.2.0, Stack 1.2.0, and LTS 7.0.)
+(Tested with Licensor 0.2.2, Stack 1.6.3, and Stackage Nightly 2018-01-16.)
 
 ## Additional resources
 
