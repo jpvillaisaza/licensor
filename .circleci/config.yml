@@ -1,0 +1,13 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: fpco/stack-build:lts-11.11
+    steps:
+      - checkout
+      - run:
+          name: Build dependencies
+          command: stack build --only-dependencies
+      - run:
+          name: Build package
+          command: stack build
