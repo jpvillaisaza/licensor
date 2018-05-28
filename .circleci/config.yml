@@ -5,9 +5,16 @@ jobs:
       - image: fpco/stack-build:lts-11.11
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - stack
       - run:
           name: Build dependencies
           command: stack build --only-dependencies
+      - save_cache:
+          key: stack
+          paths:
+            - ~/.stack/
       - run:
           name: Build package
           command: stack build
