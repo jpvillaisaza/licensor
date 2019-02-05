@@ -1,3 +1,9 @@
+# Undefined
+
+## Enhancements
+
+- Use hpack
+
 # 0.3.0 (2019-02-05)
 
 ## Enhancements
