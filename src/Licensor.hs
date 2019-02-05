@@ -116,7 +116,7 @@ getPackageDescription =
 getDependencies :: IO (Maybe (Set PackageIdentifier))
 getDependencies = do
   eitherDeps <-
-    Exception.try $ readProcess "stack" ["list-dependencies", "--separator", "-"] ""
+    Exception.try $ readProcess "stack" ["ls", "dependencies", "--separator", "-"] ""
 
   case eitherDeps of
     Left (_ :: IOError) ->
