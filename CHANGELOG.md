@@ -1,3 +1,14 @@
+# 0.3.0 (2019-02-05)
+
+## Enhancements
+
+- Use Stack (executable) to get licenses (ec8412b)
+- Use `ls dependencies` instead of `list-dependencies` (4f4d41d)
+
+## Bugs
+
+- Fix incorrect license if package matches a Hackage package (#23)
+
 # 0.2.2 (2018-01-16)
 
 - Allow http-conduit 2.3 (558fe3d)
