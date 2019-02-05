@@ -16,6 +16,7 @@ module Licensor
   ( LiLicense(..)
   , LiPackage(..)
   , getDependencies
+  , getLicenses
   , getPackage
   , orderPackagesByLicense
   , version
@@ -126,12 +127,45 @@ getDependencies = do
       return $ fmap Set.fromList $ sequence $ fmap simpleParse (lines deps)
 
 
+getLicenses :: IO (Maybe [(PackageName, License)])
+getLicenses = do
+  eitherDeps <-
+    Exception.try $ readProcess "stack" ["ls", "dependencies", "--license"] ""
+
+  case eitherDeps of
+    Left (_ :: IOError) ->
+      return Nothing
+
+    Right deps ->
+      return $ sequence $ fmap toNameLicense (lines deps)
+  where
+    toNameLicense dep =
+      case words dep of
+        [name, license] ->
+          (,) <$> simpleParse name <*> simpleParse license
+
+        _ ->
+          Nothing
+
+
 -- |
 --
 --
 
-getPackageLicense :: Bool -> PackageIdentifier -> IO (Maybe LiLicense)
-getPackageLicense quiet p@PackageIdentifier{..} = do
+getPackageLicense
+  :: Bool
+  -> PackageIdentifier
+  -> Maybe [(PackageName, License)]
+  -> IO (Maybe LiLicense)
+getPackageLicense quiet p@PackageIdentifier{..} (Just licenses) = do
+  unless quiet (putStr $ display p ++ "...")
+  case lookup pkgName licenses of
+    Just license -> do
+      unless quiet (putStrLn $ display license)
+      return $ Just (LiLicense license)
+    Nothing ->
+      return Nothing
+getPackageLicense quiet p@PackageIdentifier{..} Nothing = do
   unless quiet (putStr $ display p ++ "...")
   let
     url =
@@ -169,15 +203,16 @@ getPackageLicense quiet p@PackageIdentifier{..} = do
 orderPackagesByLicense
   :: Bool
   -> Maybe PackageIdentifier
+  -> Maybe [(PackageName, License)]
   -> Set PackageIdentifier
   -> IO (Map LiLicense (Set PackageIdentifier), Set PackageIdentifier)
-orderPackagesByLicense quiet maybeP =
+orderPackagesByLicense quiet maybeP maybeLicenses =
   let
     cond =
       maybe (const False) (==) maybeP
 
     insertPackage package orderedPackages' = do
-      maybeLicense <- getPackageLicense quiet package
+      maybeLicense <- getPackageLicense quiet package maybeLicenses
 
       (orderedPackages, failed) <- orderedPackages'
       return $

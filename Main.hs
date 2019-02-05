@@ -101,6 +101,7 @@ main = do
         return (Just package)
 
   maybeDependencies <- getDependencies
+  maybeLicenses <- getLicenses
 
   case maybeDependencies of
     Nothing ->
@@ -108,7 +109,7 @@ main = do
 
     Just dependencies -> do
       (dependenciesByLicense', failed) <-
-        orderPackagesByLicense quiet pid dependencies
+        orderPackagesByLicense quiet pid maybeLicenses dependencies
 
       let dependenciesByLicense = fmap (Set.map display) dependenciesByLicense'
 
