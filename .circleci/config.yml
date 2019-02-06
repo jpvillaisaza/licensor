@@ -7,14 +7,14 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-.stack-{{ checksum "stack.yaml" }}-{{ checksum "licensor.cabal" }}
+            - v1-.stack-{{ checksum "stack.yaml" }}-{{ checksum "package.yaml" }}
             - v1-.stack-{{ checksum "stack.yaml" }}
             - v1-.stack-
       - run:
           name: Build dependencies
           command: stack build --only-dependencies
       - save_cache:
-          key: v1-.stack-{{ checksum "stack.yaml" }}-{{ checksum "licensor.cabal" }}
+          key: v1-.stack-{{ checksum "stack.yaml" }}-{{ checksum "package.yaml" }}
           paths:
             - ~/.stack/
       - run:
