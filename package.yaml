@@ -33,8 +33,6 @@ library:
   source-dirs:
     src
   dependencies:
-    - bytestring
-    - http-conduit >= 2.1 && < 2.4
     - process
 
 executable:

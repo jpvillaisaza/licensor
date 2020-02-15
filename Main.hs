@@ -103,13 +103,10 @@ main = do
   maybeDependencies <- getDependencies
   maybeLicenses <- getLicenses
 
-  case maybeDependencies of
-    Nothing ->
-      Exit.die "Error: ..."
-
-    Just dependencies -> do
+  case (maybeDependencies, maybeLicenses) of
+    (Just dependencies, Just licenses) -> do
       (dependenciesByLicense', failed) <-
-        orderPackagesByLicense quiet pid maybeLicenses dependencies
+        orderPackagesByLicense quiet pid licenses dependencies
 
       let dependenciesByLicense = fmap (Set.map display) dependenciesByLicense'
 
@@ -130,3 +127,5 @@ main = do
       unless (null failed) $ do
         putStr "Failed: "
         print failed
+    _ ->
+      Exit.die "Error: ..."

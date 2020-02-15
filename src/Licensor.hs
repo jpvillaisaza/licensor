@@ -26,12 +26,7 @@ module Licensor
 -- base
 import qualified Control.Exception as Exception
 import Control.Monad (unless)
-import Data.Monoid ((<>))
 import Data.Version (Version)
-import System.IO
-
--- bytestring
-import qualified Data.ByteString.Lazy as ByteString
 
 -- Cabal
 import Distribution.License
@@ -50,9 +45,6 @@ import qualified Data.Set as Set
 
 -- directory
 import System.Directory
-
--- http-conduit
-import Network.HTTP.Simple (HttpException, getResponseBody, httpLBS, parseRequest)
 
 -- licensor
 import qualified Paths_licensor
@@ -155,9 +147,9 @@ getLicenses = do
 getPackageLicense
   :: Bool
   -> PackageIdentifier
-  -> Maybe [(PackageName, License)]
+  -> [(PackageName, License)]
   -> IO (Maybe LiLicense)
-getPackageLicense quiet p@PackageIdentifier{..} (Just licenses) = do
+getPackageLicense quiet p@PackageIdentifier{..} licenses = do
   unless quiet (putStr $ display p ++ "...")
   case lookup pkgName licenses of
     Just license -> do
@@ -165,35 +157,7 @@ getPackageLicense quiet p@PackageIdentifier{..} (Just licenses) = do
       return $ Just (LiLicense license)
     Nothing ->
       return Nothing
-getPackageLicense quiet p@PackageIdentifier{..} Nothing = do
-  unless quiet (putStr $ display p ++ "...")
-  let
-    url =
-      "GET https://hackage.haskell.org/package/"
-        <> display p
-        <> "/"
-        <> unPackageName pkgName
-        <> ".cabal"
-
-  req <- parseRequest url
-  eitherPd <- Exception.try $ fmap getResponseBody (httpLBS req)
-
-  case eitherPd of
-    Left (_ :: HttpException) ->
-      return Nothing
-
-    Right pd -> do
-
-      (file, handle) <- openTempFile "/tmp" "licensor"
-      hClose handle
-      ByteString.writeFile file pd
-      PackageDescription{license} <- getPackageDescription file
-      hClose handle
-      removeFile file
-
-      unless quiet (putStrLn $ display license)
-
-      return $ Just (LiLicense license)
+      -- PackageDescription{license} <- getPackageDescription file
 
 
 -- |
@@ -203,16 +167,16 @@ getPackageLicense quiet p@PackageIdentifier{..} Nothing = do
 orderPackagesByLicense
   :: Bool
   -> Maybe PackageIdentifier
-  -> Maybe [(PackageName, License)]
+  -> [(PackageName, License)]
   -> Set PackageIdentifier
   -> IO (Map LiLicense (Set PackageIdentifier), Set PackageIdentifier)
-orderPackagesByLicense quiet maybeP maybeLicenses =
+orderPackagesByLicense quiet maybeP licenses =
   let
     cond =
       maybe (const False) (==) maybeP
 
     insertPackage package orderedPackages' = do
-      maybeLicense <- getPackageLicense quiet package maybeLicenses
+      maybeLicense <- getPackageLicense quiet package licenses
 
       (orderedPackages, failed) <- orderedPackages'
       return $
