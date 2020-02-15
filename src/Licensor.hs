@@ -1,5 +1,4 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
@@ -116,7 +115,7 @@ getDependencies = do
       return Nothing
 
     Right deps ->
-      return $ fmap Set.fromList $ sequence $ fmap simpleParse (lines deps)
+      return $ Set.fromList <$> traverse simpleParse (lines deps)
 
 
 getLicenses :: IO (Maybe [(PackageName, License)])
@@ -129,7 +128,7 @@ getLicenses = do
       return Nothing
 
     Right deps ->
-      return $ sequence $ fmap toNameLicense (lines deps)
+      return $ traverse toNameLicense (lines deps)
   where
     toNameLicense dep =
       case words dep of
