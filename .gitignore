@@ -1,2 +1,4 @@
-*.cabal
+Gemfile.lock
+_site/
+
 .stack-work/

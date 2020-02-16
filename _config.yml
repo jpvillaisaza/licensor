@@ -1,0 +1,18 @@
+exclude:
+  - CHANGELOG.md
+  - Gemfile
+  - Gemfile.lock
+  - LICENSE.md
+  - Main.hs
+  - licensor.cabal
+  - package.yaml
+  - src/
+  - package.yaml
+  - stack.yaml
+  - stack.yaml.lock
+
+plugins:
+  - jekyll-readme-index
+
+readme_index:
+  remove_originals: true
