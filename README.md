@@ -79,7 +79,7 @@ $ cd licensor/ && stack build --exec licensor
 For more information, run `licensor --help`:
 
 ```
-licensor 0.2.0
+licensor 0.4.0
 
 licensor [OPTIONS]
 
@@ -87,6 +87,8 @@ Common flags:
   -? --help             Display help message
   -V --version          Print version information
      --numeric-version  Print just the version number
+  -v --verbose          Loud verbosity
+  -q --quiet            Quiet verbosity
 ```
 
 ## Notes
@@ -138,30 +140,24 @@ See [LICENSE.md](LICENSE.md).
 
 ### License report
 
-Licensor (0.2.2) depends on the following libraries:
+Licensor (0.4.0) depends on the following libraries:
 
 Library                   | License
 ------------------------- | -------------------------
 base                      | BSD3
-bytestring                | BSD3
 Cabal                     | BSD3
 cmdargs                   | BSD3
 containers                | BSD3
 directory                 | BSD3
-http-conduit              | BSD3
 process                   | BSD3
 
 And the following licenses (including transitive dependencies):
 
 License                   | Number of libraries
 ------------------------- | -------------------------
-BSD2                      | 1
-BSD3                      | 70
-ISC                       | 1
-MIT                       | 11
-UnspecifiedLicense        | 1
+BSD3                      | 20
 
-(Tested with Licensor 0.2.2, Stack 1.6.3, and Stackage Nightly 2018-01-16.)
+(Tested with Licensor 0.4.0, Stack 2.1.3, and LTS Haskell 11.11.)
 
 ## Additional resources
 
