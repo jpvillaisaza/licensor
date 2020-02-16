@@ -1,10 +1,5 @@
 # The not so great automatic Haskell licensor
 
-[![][1]][0]
-
-[0]: https://circleci.com/gh/jpvillaisaza/licensor
-[1]: https://circleci.com/gh/jpvillaisaza/licensor.svg?style=shield
-
 [![][2]](https://www.stackage.org/lts/package/licensor)
 [![][3]](https://www.stackage.org/nightly/package/licensor)
 
