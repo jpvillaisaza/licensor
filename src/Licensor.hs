@@ -1,5 +1,4 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
 ----------------------------------------------------------------------
@@ -28,13 +27,13 @@ import Control.Monad (unless)
 import Data.Version (Version)
 
 -- Cabal
-import Distribution.License
-import Distribution.Package
-import Distribution.PackageDescription
-import Distribution.PackageDescription.Parse
-import Distribution.Simple.Utils
-import Distribution.Text
-import Distribution.Verbosity
+import Distribution.License (License)
+import Distribution.Package (PackageIdentifier(..), PackageName)
+import Distribution.PackageDescription (PackageDescription, packageDescription)
+import Distribution.PackageDescription.Parse (readGenericPackageDescription)
+import Distribution.Simple.Utils (comparing, findPackageDesc)
+import Distribution.Text (Text, display, simpleParse)
+import Distribution.Verbosity (silent)
 
 -- containers
 import Data.Map.Strict (Map)
@@ -43,13 +42,13 @@ import Data.Set (Set)
 import qualified Data.Set as Set
 
 -- directory
-import System.Directory
+import System.Directory (getCurrentDirectory)
 
 -- licensor
 import qualified Paths_licensor
 
 -- process
-import System.Process
+import System.Process (readProcess)
 
 
 -- |
@@ -89,7 +88,7 @@ getPackage :: IO (Maybe PackageDescription)
 getPackage = do
   currentDirectory <- getCurrentDirectory
   fmap getPackageDescription <$> findPackageDesc currentDirectory
-    >>= either (const (return Nothing)) (fmap Just)
+    >>= either (const (pure Nothing)) (fmap Just)
 
 
 -- |
@@ -98,7 +97,7 @@ getPackage = do
 
 getPackageDescription :: FilePath -> IO PackageDescription
 getPackageDescription =
-  fmap packageDescription . readPackageDescription silent
+  fmap packageDescription . readGenericPackageDescription silent
 
 
 -- |
@@ -112,10 +111,10 @@ getDependencies = do
 
   case eitherDeps of
     Left (_ :: IOError) ->
-      return Nothing
+      pure Nothing
 
     Right deps ->
-      return $ Set.fromList <$> traverse simpleParse (lines deps)
+      pure $ Set.fromList <$> traverse simpleParse (lines deps)
 
 
 getLicenses :: IO (Maybe [(PackageName, License)])
@@ -125,10 +124,10 @@ getLicenses = do
 
   case eitherDeps of
     Left (_ :: IOError) ->
-      return Nothing
+      pure Nothing
 
     Right deps ->
-      return $ traverse toNameLicense (lines deps)
+      pure $ traverse toNameLicense (lines deps)
   where
     toNameLicense dep =
       case words dep of
@@ -148,15 +147,14 @@ getPackageLicense
   -> PackageIdentifier
   -> [(PackageName, License)]
   -> IO (Maybe LiLicense)
-getPackageLicense quiet p@PackageIdentifier{..} licenses = do
-  unless quiet (putStr $ display p ++ "...")
-  case lookup pkgName licenses of
+getPackageLicense quiet packageIdentifier licenses = do
+  unless quiet (putStr $ display packageIdentifier ++ "...")
+  case lookup (pkgName packageIdentifier) licenses of
     Just license -> do
       unless quiet (putStrLn $ display license)
-      return $ Just (LiLicense license)
+      pure $ Just (LiLicense license)
     Nothing ->
-      return Nothing
-      -- PackageDescription{license} <- getPackageDescription file
+      pure Nothing
 
 
 -- |
@@ -178,7 +176,7 @@ orderPackagesByLicense quiet maybeP licenses =
       maybeLicense <- getPackageLicense quiet package licenses
 
       (orderedPackages, failed) <- orderedPackages'
-      return $
+      pure $
         if cond package
           then
             (orderedPackages, failed)

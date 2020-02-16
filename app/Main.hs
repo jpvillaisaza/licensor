@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE NamedFieldPuns #-}
 
 ----------------------------------------------------------------------
 -- |
@@ -86,11 +86,11 @@ main = do
         if stack
           then do
             putStrLn "Found stack.yaml..."
-            return Nothing
+            pure Nothing
           else
             Exit.die "Error: No Cabal file found."
 
-      Just PackageDescription{..} -> do
+      Just PackageDescription { license, package } -> do
         putStrLn $
           "Package: "
             <> display package
@@ -98,7 +98,7 @@ main = do
             <> "License: "
             <> display license
             <> ")"
-        return (Just package)
+        pure (Just package)
 
   maybeDependencies <- getDependencies
   maybeLicenses <- getLicenses
