@@ -11,7 +11,7 @@ jobs:
       uses: actions/cache@v1
       with:
         path: ~/.stack
-        key: ${{ runner.os }}-stack-${{ hashFiles('stack.yaml.lock') }}
+        key: stack-${{ hashFiles('stack.yaml.lock') }}
     - name: Install GHC
       run: stack setup
     - name: Build dependencies
