@@ -1,0 +1,20 @@
+name: Main
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Cache dependencies
+      uses: actions/cache@v1
+      with:
+        path: ~/.stack
+        key: stack-${{ hashFiles('stack.yaml.lock') }}
+    - name: Install GHC
+      run: stack setup
+    - name: Build dependencies
+      run: stack build --only-dependencies
+    - name: Build package
+      run: stack build
