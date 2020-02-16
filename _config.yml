@@ -1,9 +1,9 @@
 exclude:
+  - app/
   - CHANGELOG.md
   - Gemfile
   - Gemfile.lock
   - LICENSE.md
-  - Main.hs
   - licensor.cabal
   - package.yaml
   - src/

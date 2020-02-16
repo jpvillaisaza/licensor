@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f9f3cf444be81006218fdda188775e6515f7b3bb5352a2a6ed45106318dd54bf
+-- hash: 28712dcff95a982ef86182ec93effb3c20abb4e12bb800d4c02803aee6bc0400
 
 name:           licensor
 version:        0.3.0
@@ -48,6 +48,8 @@ executable licensor
   main-is: Main.hs
   other-modules:
       Paths_licensor
+  hs-source-dirs:
+      app
   ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       Cabal >=1.22 && <2.1

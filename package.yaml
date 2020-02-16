@@ -36,10 +36,14 @@ library:
     - process
 
 executable:
+  source-dirs:
+    app
   main:
     Main.hs
   dependencies:
     - cmdargs >= 0.10 && < 0.11
     - licensor
   ghc-options:
-    - -threaded -rtsopts -with-rtsopts=-N
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
