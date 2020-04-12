@@ -22,7 +22,7 @@ extra-source-files:
 
 dependencies:
   - Cabal
-  - base
+  - base >= 4.8 && < 5
   - containers
   - directory
 
