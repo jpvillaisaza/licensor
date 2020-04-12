@@ -21,8 +21,8 @@ extra-source-files:
   - README.md
 
 dependencies:
-  - Cabal >= 1.22 && < 2.1
-  - base >= 4.8 && < 4.11
+  - Cabal
+  - base
   - containers
   - directory
 
@@ -41,7 +41,7 @@ executable:
   main:
     Main.hs
   dependencies:
-    - cmdargs >= 0.10 && < 0.11
+    - cmdargs
     - licensor
   ghc-options:
     - -threaded

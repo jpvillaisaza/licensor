@@ -30,9 +30,10 @@ import Data.Version (Version)
 import Distribution.License (License)
 import Distribution.Package (PackageIdentifier(..), PackageName)
 import Distribution.PackageDescription (PackageDescription, packageDescription)
-import Distribution.PackageDescription.Parse (readGenericPackageDescription)
+import Distribution.PackageDescription.Parsec (readGenericPackageDescription)
+import Distribution.Pretty (Pretty)
 import Distribution.Simple.Utils (comparing, findPackageDesc)
-import Distribution.Text (Text, display, simpleParse)
+import Distribution.Text (display, simpleParse)
 import Distribution.Verbosity (silent)
 
 -- containers
@@ -56,7 +57,7 @@ import System.Process (readProcess)
 --
 
 newtype LiLicense = LiLicense { getLicense :: License }
-  deriving (Eq, Read, Show, Text)
+  deriving (Eq, Read, Show, Pretty)
 
 
 -- |

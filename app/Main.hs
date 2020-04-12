@@ -21,7 +21,6 @@ import Licensor
 -- base
 import Control.Monad
 import Data.List
-import Data.Monoid ((<>))
 import qualified Data.Version as Version
 import System.Environment
 import qualified System.Exit as Exit
@@ -90,15 +89,15 @@ main = do
           else
             Exit.die "Error: No Cabal file found."
 
-      Just PackageDescription { license, package } -> do
+      Just pd -> do
         putStrLn $
           "Package: "
-            <> display package
+            <> display (package pd)
             <> " ("
             <> "License: "
-            <> display license
+            <> display (license pd)
             <> ")"
-        pure (Just package)
+        pure (Just $ package pd)
 
   maybeDependencies <- getDependencies
   maybeLicenses <- getLicenses
@@ -111,16 +110,16 @@ main = do
       let dependenciesByLicense = fmap (Set.map display) dependenciesByLicense'
 
       forM_ (Map.keys dependenciesByLicense) $
-        \license ->
+        \li ->
           let
-            n = dependenciesByLicense Map.! license
+            n = dependenciesByLicense Map.! li
           in do
             putStrLn "-----"
             putStrLn $
               show (Set.size n)
                 <> (if Set.size n == 1 then " package " else " packages ")
                 <> "licensed under "
-                <> display license
+                <> display li
                 <> ": "
                 <> intercalate ", " (Set.toList n)
 
