@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: e7438494b63cda0e6f6373f7104fbd3412e3e2335242d83687a65b0fa02f99d0
+-- hash: 04686eb8d29c41fcf265372ac43506592ea89f65e6adbe25577a64f7ecb5f5db
 
 name:           licensor
-version:        0.4.0
+version:        0.4.1
 synopsis:       A license compatibility helper
 description:    A license compatibility helper.
 category:       Distribution

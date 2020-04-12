@@ -1,3 +1,8 @@
+# 0.4.1 (2020-04-12)
+
+- Set resolver to LTS 15.8 (a79cb02)
+  * Allow Cabal > 2.2
+
 # 0.4.0 (2020-02-16)
 
 ## Enhancements
