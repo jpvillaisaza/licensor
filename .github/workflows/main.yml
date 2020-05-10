@@ -22,6 +22,5 @@ jobs:
       with:
         enable-stack: true
         ghc-version: 8.8.3
-        stack-setup-ghc: true
-    - run: stack build --only-dependencies
-    - run: stack build
+    - run: stack --system-ghc build --only-dependencies
+    - run: stack --system-ghc build
