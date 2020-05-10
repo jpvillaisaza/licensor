@@ -16,12 +16,11 @@ jobs:
     - uses: actions/cache@v1
       with:
         key: ${{ runner.os }}-stack-${{ hashFiles('stack.yaml.lock') }}
-        path: .stack
+        path: .stack-work
         restore-keys: ${{ runner.os }}-stack-
     - uses: actions/setup-haskell@v1.1
       with:
         enable-stack: true
         ghc-version: 8.8.3
-    - run: stack --system-ghc setup
     - run: stack --system-ghc build --only-dependencies
     - run: stack --system-ghc build
