@@ -19,5 +19,7 @@ jobs:
         path: .stack
         restore-keys: ${{ runner.os }}-stack-
     - uses: actions/setup-haskell@v1.1
-    - run: stack --system-ghc build --only-dependencies
-    - run: stack --system-ghc build
+      with:
+        ghc: 8.8.3
+    - run: stack build --only-dependencies
+    - run: stack build
