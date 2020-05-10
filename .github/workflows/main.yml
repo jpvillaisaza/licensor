@@ -23,5 +23,9 @@ jobs:
         enable-stack: true
         ghc-version: 8.8.3
         stack-version: 2.1.3
+    - run: ls $HOME/.ghcup/ghc || echo "not found"
+    - run: ls $HOME/.ghcup/ghc/8.8.3/bin || echo "not found"
+    - run: ls /opt/ghc/ || echo "not found"
+    - run: ls /opt/ghc/8.8.3/bin || echo "not found"
     - run: stack --system-ghc build --only-dependencies
     - run: stack --system-ghc build
