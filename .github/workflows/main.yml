@@ -15,9 +15,9 @@ jobs:
     - uses: actions/checkout@v2
     - uses: actions/cache@v1
       with:
-        key: ${{ runner.os }}-stack-${{ hashFiles('stack.yaml.lock') }}
+        key: ${{ runner.os }}-${{ hashFiles('stack.yaml.lock') }}
         path: .stack-work
-        restore-keys: ${{ runner.os }}-stack-
+        restore-keys: ${{ runner.os }}-
     - uses: actions/setup-haskell@v1.1
       with:
         enable-stack: true
