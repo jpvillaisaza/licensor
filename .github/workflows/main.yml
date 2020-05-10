@@ -18,7 +18,7 @@ jobs:
         key: ${{ runner.os }}-stack-${{ hashFiles('stack.yaml.lock') }}
         path: .stack
         restore-keys: ${{ runner.os }}-stack-
-    - run: ghc --version
+    - run: ghc-8.8.3 --version
     - run: which ghc-8.8.3
     - run: stack --system-ghc build --only-dependencies
     - run: stack --system-ghc build
