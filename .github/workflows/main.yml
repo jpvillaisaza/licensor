@@ -19,7 +19,7 @@ jobs:
         path: .stack-work
         restore-keys: ${{ runner.os }}-
     - run: echo '::add-path::/opt/ghc/8.8.3/bin'
-    - run: echo '::add-path::$HOME/.local/bin'
+    - run: echo '::add-path::/home/runner/.local/bin'
     - continue-on-error: true
       run: stack upgrade --binary-only
     - run: stack --system-ghc build --only-dependencies
