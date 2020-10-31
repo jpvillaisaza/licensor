@@ -37,7 +37,7 @@ library
       src
   ghc-options: -Wall
   build-depends:
-      Cabal
+      Cabal >= 3.0
     , base >=4.8 && <5
     , containers
     , directory
