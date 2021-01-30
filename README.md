@@ -9,6 +9,9 @@
 Licensor is a program that generates a report of the dependencies and
 transitive dependencies of a Haskell project and their licenses.
 
+NOTE: Currently, [Stack][https://haskellstack.org/] and a `stack.yaml` file are
+required.
+
 ## Description
 
 Choosing a license for a software project or determining whether a
@@ -40,9 +43,11 @@ Licensor is not the only license compatibility helper for Haskell:
 - Licensor uses a Cabal library and Stack program approach for
   detecting licenses and listing dependencies, respectively. For a
   Cabal library and program approach, consider using
-  the [cabal-dependency-licenses][rp-01] program.
+  the [cabal-dependency-licenses][rp-01] program or the [cabal-plan][rp-02]
+  utility.
 
 [rp-01]: https://hackage.haskell.org/package/cabal-dependency-licenses
+[rp-02]: https://hackage.haskell.org/package/cabal-plan
 
 ## Installation and usage
 
