@@ -1,3 +1,7 @@
+# 0.4.2 (2021-01-31)
+
+- Fix "Error: ..." message
+
 # 0.4.1 (2020-04-12)
 
 - Set resolver to LTS 15.8 (a79cb02)
