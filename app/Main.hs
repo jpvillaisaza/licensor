@@ -87,7 +87,7 @@ main = do
             putStrLn "Found stack.yaml..."
             pure Nothing
           else
-            Exit.die "Error: No Cabal file found."
+            Exit.die "Error: No stack.yaml file found."
 
       Just pd -> do
         putStrLn $
@@ -127,4 +127,4 @@ main = do
         putStr "Failed: "
         print failed
     _ ->
-      Exit.die "Error: ..."
+      Exit.die "Error: Unable to run 'stack ls dependencies'"
