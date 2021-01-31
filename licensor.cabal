@@ -38,6 +38,8 @@ library
       Licensor
   other-modules:
       Paths_licensor
+  autogen-modules:
+      Paths_licensor
   build-depends:
       process
 
