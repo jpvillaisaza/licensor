@@ -9,7 +9,7 @@
 Licensor is a program that generates a report of the dependencies and
 transitive dependencies of a Haskell project and their licenses.
 
-NOTE: Currently, [Stack][https://haskellstack.org/] and a `stack.yaml` file are
+NOTE: Currently, [Stack](https://haskellstack.org/) and a `stack.yaml` file are
 required.
 
 ## Description
@@ -84,16 +84,10 @@ $ cd licensor/ && stack build --exec licensor
 For more information, run `licensor --help`:
 
 ```
-licensor 0.4.0
-
-licensor [OPTIONS]
-
-Common flags:
-  -? --help             Display help message
-  -V --version          Print version information
-     --numeric-version  Print just the version number
-  -v --verbose          Loud verbosity
-  -q --quiet            Quiet verbosity
+usage: licensor
+  -q, -s  --quiet, --silent  Quiet/silent mode
+  -h      --help             Display help message
+  -V      --version          Print version information
 ```
 
 ## Notes
@@ -145,24 +139,24 @@ See [LICENSE.md](LICENSE.md).
 
 ### License report
 
-Licensor (0.4.0) depends on the following libraries:
+Licensor (0.4.3) depends on the following libraries:
 
 Library                   | License
 ------------------------- | -------------------------
-base                      | BSD3
-Cabal                     | BSD3
-cmdargs                   | BSD3
-containers                | BSD3
-directory                 | BSD3
-process                   | BSD3
+Cabal                     | BSD-3
+base                      | BSD-3
+containers                | BSD-3
+directory                 | BSD-3
+process                   | BSD-3
 
 And the following licenses (including transitive dependencies):
 
 License                   | Number of libraries
 ------------------------- | -------------------------
-BSD3                      | 20
+BSD-2                     | 1
+BSD-3                     | 20
 
-(Tested with Licensor 0.4.0, Stack 2.1.3, and LTS Haskell 11.11.)
+(Tested with Licensor 0.4.3, Stack 2.5.1, and LTS Haskell 15.8.)
 
 ## Additional resources
 

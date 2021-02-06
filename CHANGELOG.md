@@ -1,3 +1,7 @@
+# 0.4.3 (2021-02-06)
+
+- Use System.Console.GetOpt instead of cmdargs
+
 # 0.4.2 (2021-01-31)
 
 - Fix "Error: ..." message
