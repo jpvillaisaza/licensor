@@ -1,6 +1,3 @@
-{-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE NamedFieldPuns #-}
-
 ----------------------------------------------------------------------
 -- |
 -- Module: Main
@@ -15,22 +12,19 @@ module Main
   )
   where
 
--- licensor
-import Licensor
-
--- base
-import Control.Monad
-import Data.List
-import qualified Data.Version as Version
-import System.Environment
-import qualified System.Exit as Exit
-
 -- Cabal
 import Distribution.PackageDescription
 import Distribution.Text
 
--- cmdargs
-import System.Console.CmdArgs
+-- base
+import Control.Monad (unless)
+import Data.Foldable (for_)
+import Data.List (foldl', intercalate)
+import Data.Version (showVersion)
+import System.Console.GetOpt
+import System.Environment (getArgs, getProgName)
+import System.Exit (die, exitFailure, exitSuccess)
+import System.IO (hPutStrLn, stderr, stdout)
 
 -- containers
 import qualified Data.Map.Strict as Map
@@ -39,42 +33,63 @@ import qualified Data.Set as Set
 -- directory
 import System.Directory (doesFileExist)
 
-
--- |
---
---
-
-data LiArgs =
-  LiArgs
-    {
-    }
-  deriving (Data)
+-- licensor
+import Licensor
 
 
--- |
---
---
-
-liArgs :: String -> Mode (CmdArgs LiArgs)
-liArgs s =
-  cmdArgsMode $
-    LiArgs
-      {
-      }
-  &= program s
-  &= summary (unwords ["licensor", Version.showVersion version])
-  &= verbosity
+prettyUsageInfo :: String -> String
+prettyUsageInfo progName =
+  "usage: " <> usageInfo progName optDescrs
 
 
--- |
---
---
+prettyVersion :: String -> String
+prettyVersion progName =
+  unwords [progName, showVersion version]
+
+
+optDescrs :: [OptDescr (Bool -> IO Bool)]
+optDescrs =
+  [ Option ['q', 's'] ["quiet", "silent"]
+      (NoArg (\_ -> pure False))
+      "Quiet/silent mode"
+  , Option ['h'] ["help"]
+      (NoArg (\_ -> exitWith prettyUsageInfo))
+      "Display help message"
+  , Option ['V'] ["version"]
+      (NoArg (\_ -> exitWith prettyVersion))
+       "Print version information"
+   ]
+   where
+     exitWith f = do
+       progName <- getProgName
+       hPutStrLn stdout (f progName)
+       exitSuccess
+
 
 main :: IO ()
 main = do
-  LiArgs <- cmdArgsRun . liArgs =<< getProgName
+  args <- getArgs
+  progName <- getProgName
+  case getOpt' Permute optDescrs args of
+    (opts, [], [], []) -> do
+      verbose <- foldl' (>>=) (pure True) opts
+      main' verbose
+    (_, command:_, _, _) -> do
+      hPutStrLn stderr ("unknown command: " <> command)
+      hPutStrLn stderr (prettyUsageInfo progName)
+      exitFailure
+    (_, _, option:_, _) -> do
+      hPutStrLn stderr ("unknown option: " <> option)
+      hPutStrLn stderr (prettyUsageInfo progName)
+      exitFailure
+    (_, _, _, _) -> do
+      hPutStrLn stderr (prettyUsageInfo progName)
+      exitFailure
 
-  quiet <- fmap not isNormal
+
+main' :: Bool -> IO ()
+main' verbose = do
+  let silent = not verbose
 
   maybePackage <- getPackage
 
@@ -87,7 +102,7 @@ main = do
             putStrLn "Found stack.yaml..."
             pure Nothing
           else
-            Exit.die "Error: No stack.yaml file found."
+            die "Error: No stack.yaml file found."
 
       Just pd -> do
         putStrLn $
@@ -105,11 +120,11 @@ main = do
   case (maybeDependencies, maybeLicenses) of
     (Just dependencies, Just licenses) -> do
       (dependenciesByLicense', failed) <-
-        orderPackagesByLicense quiet pid licenses dependencies
+        orderPackagesByLicense silent pid licenses dependencies
 
       let dependenciesByLicense = fmap (Set.map display) dependenciesByLicense'
 
-      forM_ (Map.keys dependenciesByLicense) $
+      for_ (Map.keys dependenciesByLicense) $
         \li ->
           let
             n = dependenciesByLicense Map.! li
@@ -127,4 +142,4 @@ main = do
         putStr "Failed: "
         print failed
     _ ->
-      Exit.die "Error: Unable to run 'stack ls dependencies'"
+      die "Error: Unable to run 'stack ls dependencies'"
