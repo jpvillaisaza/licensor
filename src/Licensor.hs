@@ -1,5 +1,6 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE ViewPatterns #-}
 
 ----------------------------------------------------------------------
 -- |
@@ -16,6 +17,7 @@ module Licensor
   , getDependencies
   , getLicenses
   , getPackage
+  , getPackageLicenseFiles
   , orderPackagesByLicense
   , version
   )
@@ -24,13 +26,19 @@ module Licensor
 -- base
 import qualified Control.Exception as Exception
 import Control.Monad (unless)
+import Data.Traversable (for)
 import Data.Version (Version)
+
+-- bytestring
+import qualified Data.ByteString.Lazy as LBS
 
 -- Cabal
 import Distribution.License (License)
-import Distribution.Package (PackageIdentifier(..), PackageName)
-import Distribution.PackageDescription (PackageDescription, packageDescription)
-import Distribution.PackageDescription.Parsec (readGenericPackageDescription)
+import Distribution.Package (PackageIdentifier(..), PackageName, unPackageName)
+import Distribution.PackageDescription
+  (PackageDescription, licenseFiles, packageDescription)
+import Distribution.PackageDescription.Parsec
+  (parseGenericPackageDescriptionMaybe, readGenericPackageDescription)
 import Distribution.Pretty (Pretty)
 import Distribution.Simple.Utils (comparing, findPackageDesc)
 import Distribution.Text (display, simpleParse)
@@ -45,12 +53,26 @@ import qualified Data.Set as Set
 -- directory
 import System.Directory (getCurrentDirectory)
 
+-- http-client
+import Network.HTTP.Client (httpLbs, parseRequest, responseBody)
+
+-- http-client-tls
+import Network.HTTP.Client.TLS (getGlobalManager)
+
 -- licensor
 import qualified Paths_licensor
 
 -- process
 import System.Process (readProcess)
 
+-- tar
+import qualified Codec.Archive.Tar as Tar
+
+-- temporary
+import qualified System.IO.Temp as Temp
+
+-- zlib
+import qualified Codec.Compression.GZip as GZip
 
 -- |
 --
@@ -206,3 +228,42 @@ orderPackagesByLicense quiet maybeP licenses =
 version :: Version
 version =
   Paths_licensor.version
+
+
+getPackageLicenseFiles :: PackageIdentifier -> IO (Maybe [String])
+getPackageLicenseFiles packageIdentifier =
+  getPackageLicenseFiles'
+    (unPackageName (pkgName packageIdentifier))
+    (display packageIdentifier)
+
+getPackageLicenseFiles' :: String -> String -> IO (Maybe [String])
+getPackageLicenseFiles' packageName packageId = do
+  putStrLn ""
+  putStrLn ("### " <> packageId)
+  putStrLn ""
+  manager <- getGlobalManager
+  genPkgDescrReq <- parseRequest (mkRequest (packageName <> ".cabal"))
+  genPkgDescr <- LBS.toStrict . responseBody <$> httpLbs genPkgDescrReq manager
+  let mGenPkgDescr = parseGenericPackageDescriptionMaybe genPkgDescr
+  case licenseFiles . packageDescription <$> mGenPkgDescr of
+    Just files -> do
+      pkgReq <- parseRequest (mkRequest (packageId <> ".tar.gz"))
+      pkg <- responseBody <$> httpLbs pkgReq manager
+      let entries = Tar.read (GZip.decompress pkg)
+      pkgLicenseFiles <-
+        Temp.withSystemTempDirectory packageId $ \tmpDir -> do
+          Tar.unpack tmpDir entries
+          for files $ \file -> do
+            contents <- readFile (tmpDir <> "/" <> packageId <> "/" <> file)
+            putStrLn (file <> ":")
+            putStrLn ""
+            putStrLn "```"
+            putStrLn contents
+            putStrLn "```"
+            pure file
+      pure (Just pkgLicenseFiles)
+    Nothing ->
+      pure Nothing
+  where
+    mkRequest r =
+      "GET https://hackage.haskell.org/package/" <> packageId <> "/" <> r

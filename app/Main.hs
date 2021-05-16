@@ -17,8 +17,8 @@ import Distribution.PackageDescription
 import Distribution.Text
 
 -- base
-import Control.Monad (unless)
-import Data.Foldable (for_)
+import Control.Monad (unless, when)
+import Data.Foldable (for_, traverse_)
 import Data.List (foldl', intercalate)
 import Data.Version (showVersion)
 import System.Console.GetOpt
@@ -47,11 +47,14 @@ prettyVersion progName =
   unwords [progName, showVersion version]
 
 
-optDescrs :: [OptDescr (Bool -> IO Bool)]
+optDescrs :: [OptDescr ((Bool, Bool) -> IO (Bool, Bool))]
 optDescrs =
   [ Option ['q', 's'] ["quiet", "silent"]
-      (NoArg (\_ -> pure False))
+      (NoArg (\(_, b) -> pure (False, b)))
       "Quiet/silent mode"
+  , Option [] ["licenses"]
+      (NoArg (\(a, _) -> pure (a, True)))
+      "Fetch license files"
   , Option ['h'] ["help"]
       (NoArg (\_ -> exitWith prettyUsageInfo))
       "Display help message"
@@ -72,7 +75,7 @@ main = do
   progName <- getProgName
   case getOpt' Permute optDescrs args of
     (opts, [], [], []) -> do
-      verbose <- foldl' (>>=) (pure True) opts
+      verbose <- foldl' (>>=) (pure (True, False)) opts
       main' verbose
     (_, command:_, _, _) -> do
       hPutStrLn stderr ("unknown command: " <> command)
@@ -87,8 +90,8 @@ main = do
       exitFailure
 
 
-main' :: Bool -> IO ()
-main' verbose = do
+main' :: (Bool, Bool) -> IO ()
+main' (verbose, fetchLicenses) = do
   let silent = not verbose
 
   maybePackage <- getPackage
@@ -105,6 +108,9 @@ main' verbose = do
             die "Error: No stack.yaml file found."
 
       Just pd -> do
+        when fetchLicenses $ do
+          putStrLn $ "# " <> display (package pd)
+          putStrLn ""
         putStrLn $
           "Package: "
             <> display (package pd)
@@ -119,24 +125,27 @@ main' verbose = do
 
   case (maybeDependencies, maybeLicenses) of
     (Just dependencies, Just licenses) -> do
-      (dependenciesByLicense', failed) <-
+      (dependenciesByLicense, failed) <-
         orderPackagesByLicense silent pid licenses dependencies
-
-      let dependenciesByLicense = fmap (Set.map display) dependenciesByLicense'
 
       for_ (Map.keys dependenciesByLicense) $
         \li ->
           let
             n = dependenciesByLicense Map.! li
           in do
-            putStrLn "-----"
+            when fetchLicenses $ do
+              putStrLn ""
+              putStrLn $ "## " <> display li
+              putStrLn ""
             putStrLn $
               show (Set.size n)
                 <> (if Set.size n == 1 then " package " else " packages ")
                 <> "licensed under "
                 <> display li
                 <> ": "
-                <> intercalate ", " (Set.toList n)
+                <> intercalate ", " (Set.toList (Set.map display n))
+            when fetchLicenses $
+              traverse_ getPackageLicenseFiles (Set.toList n)
 
       unless (null failed) $ do
         putStr "Failed: "
