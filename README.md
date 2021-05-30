@@ -81,11 +81,25 @@ Or build and run `licensor` inside the project:
 $ cd licensor/ && stack build --exec licensor
 ```
 
+To generate a report including license files for all dependencies,
+use the `--licenses` option and redirect the output to a file:
+
+```
+$ licensor --quiet --licenses > licenses.md
+```
+
+See [licenses.md](licenses.md) for an example.
+
+NOTE: This is currently using the Hackage API, which doesn't require
+building any package, but could probably be improved to use the
+installed packages if present.
+
 For more information, run `licensor --help`:
 
 ```
 usage: licensor
   -q, -s  --quiet, --silent  Quiet/silent mode
+          --licenses         Fetch license files
   -h      --help             Display help message
   -V      --version          Print version information
 ```
@@ -139,24 +153,31 @@ See [LICENSE.md](LICENSE.md).
 
 ### License report
 
-Licensor (0.4.3) depends on the following libraries:
+Licensor (0.5.0) depends on the following libraries:
 
 Library                   | License
 ------------------------- | -------------------------
 Cabal                     | BSD-3
 base                      | BSD-3
+bytestring                | BSD-3
 containers                | BSD-3
 directory                 | BSD-3
+http-client               | MIT
+http-client-tls           | MIT
 process                   | BSD-3
+tar                       | BSD-3
+temporary                 | BSD-3
+zlib                      | BSD-3
 
 And the following licenses (including transitive dependencies):
 
 License                   | Number of libraries
 ------------------------- | -------------------------
 BSD-2                     | 1
-BSD-3                     | 20
+BSD-3                     | 22
+MIT                       | 5
 
-(Tested with Licensor 0.4.3, Stack 2.5.1, and LTS Haskell 15.8.)
+(Tested with Licensor 0.5.0, Stack 2.7.1, and LTS Haskell 17.13.)
 
 ## Additional resources
 

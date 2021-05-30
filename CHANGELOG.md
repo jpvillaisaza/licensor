@@ -1,3 +1,7 @@
+# 0.5.0 (2021-05-30)
+
+- Add `--licenses` option to collect the license files for dependencies
+
 # 0.4.3 (2021-02-06)
 
 - Use System.Console.GetOpt instead of cmdargs
