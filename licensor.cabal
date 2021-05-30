@@ -41,7 +41,13 @@ library
   autogen-modules:
       Paths_licensor
   build-depends:
-      process
+      bytestring
+    , http-client
+    , http-client-tls
+    , process
+    , tar
+    , temporary
+    , zlib
 
 executable licensor
   import:
